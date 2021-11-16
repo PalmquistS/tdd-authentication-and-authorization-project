@@ -7,7 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AuthenticationAndAuthorizationTest {
+
     AuthenticationAndAuthorization authenticationAndAuthorization;
+
     @BeforeEach
     void setUp() {
         authenticationAndAuthorization = new AuthenticationAndAuthorization();
@@ -18,7 +20,11 @@ public class AuthenticationAndAuthorizationTest {
     @Test
     void test_logg_in_success() {
         boolean isLoggedIn = authenticationAndAuthorization.loggIn("anna", "losen");
+        boolean isLoggedIn2 = authenticationAndAuthorization.loggIn("bertil", "123456");
+        boolean isLoggedIn3 = authenticationAndAuthorization.loggIn("kalle", "password");
         assertTrue(isLoggedIn);
+        assertTrue(isLoggedIn2);
+        assertTrue(isLoggedIn3);
 
     }
 }
