@@ -5,26 +5,26 @@ import java.util.List;
 
 public class AuthenticationAndAuthorization {
 
-    DecodeAndVerifyPassword decodeAndVerifyPassword;
+    EncodeAndVerifyPassword encodeAndVerifyPassword;
     User user;
     List<User> userList = new ArrayList<>();
 
     public void addUser(String name, String password) {
-        decodeAndVerifyPassword = new DecodeAndVerifyPassword();
-        String salt = DecodeAndVerifyPassword.generateSalt(5).get();
-        password = DecodeAndVerifyPassword.hashPassword(password, salt).get();
+        encodeAndVerifyPassword = new EncodeAndVerifyPassword();
+        String salt = EncodeAndVerifyPassword.generateSalt(5).get();
+        password = EncodeAndVerifyPassword.hashPassword(password, salt).get();
         user = new User(name, password, salt);
         userList.add(user);
     }
 
     public boolean loggIn(String name, String password) {
-        decodeAndVerifyPassword = new DecodeAndVerifyPassword();
+        encodeAndVerifyPassword = new EncodeAndVerifyPassword();
         boolean isTrue = false;
         for (User value : userList) {
             if (name.equals(value.getName())) {
                 String salt = value.getSalt();
                 String passwordFromUserList = value.getPassword();
-                if (DecodeAndVerifyPassword.verifyPassword(password, passwordFromUserList, salt)) {
+                if (EncodeAndVerifyPassword.verifyPassword(password, passwordFromUserList, salt)) {
                     isTrue = true;
                     break;
                 }

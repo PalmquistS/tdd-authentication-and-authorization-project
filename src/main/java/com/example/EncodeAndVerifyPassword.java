@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Optional;
 
-public class DecodeAndVerifyPassword {
+public class EncodeAndVerifyPassword {
     private static final SecureRandom RAND = new SecureRandom();
 
     private static final int ITERATIONS = 65536;
