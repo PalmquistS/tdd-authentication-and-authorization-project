@@ -12,10 +12,10 @@ public class AuthenticationAndAuthorizationTest {
     AuthenticationAndAuthorization authenticationAndAuthorization;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws UserNameAlreadyExistsException {
         authenticationAndAuthorization = new AuthenticationAndAuthorization();
         authenticationAndAuthorization.addUser("anna", "losen", List.of("ACCOUNT"), List.of("READ"));
-        authenticationAndAuthorization.addUser("bertil", "123456", List.of("ACCOUNT","ACCOUNT"), List.of("READ", "WRITE"));
+        authenticationAndAuthorization.addUser("berit", "123456", List.of("ACCOUNT", "ACCOUNT"), List.of("READ", "WRITE"));
         authenticationAndAuthorization.addUser("kalle", "password", List.of("PROVISION_CALC"), List.of("EXECUTE"));
     }
 
@@ -43,19 +43,27 @@ public class AuthenticationAndAuthorizationTest {
     }
 
     @Test
-    void test_check_users_rights_in_program_success() throws WrongTokenReturnException, NoRecourceNameException {
-        String tokenInReturn =   authenticationAndAuthorization.loggIn("bertil", "123456");
+    void test_check_users_rights_in_program_success() throws WrongTokenReturnException, WrongResourceNameException {
+        String tokenInReturn = authenticationAndAuthorization.loggIn("berit", "123456");
         List<String> userRights = authenticationAndAuthorization.getUsersRightsInProgram(tokenInReturn, "ACCOUNT");
 
-        assertEquals(List.of("READ","WRITE"), userRights);
+        assertEquals(List.of("READ", "WRITE"), userRights);
     }
+
     @Test
     void test_check_users_rights_fail_because_of_wrong_resource_name() throws WrongTokenReturnException {
-        String tokenInReturn =   authenticationAndAuthorization.loggIn("bertil", "123456");
-        NoRecourceNameException noRecourceNameException = assertThrows(NoRecourceNameException.class, () ->
+        String tokenInReturn = authenticationAndAuthorization.loggIn("berit", "123456");
+        WrongResourceNameException wrongResourceNameException = assertThrows(WrongResourceNameException.class, () ->
                 authenticationAndAuthorization.getUsersRightsInProgram(tokenInReturn, "WrongResourceName"));
 
-        assertEquals("No resource with that name found", noRecourceNameException.getMessage());
+        assertEquals("No resource with that name found", wrongResourceNameException.getMessage());
     }
 
+    @Test
+    void test_add_new_user_fail_because_username_already_exists() {
+        UserNameAlreadyExistsException userNameAlreadyExistsException = assertThrows(UserNameAlreadyExistsException.class, () ->
+                authenticationAndAuthorization.addUser("anna", "uniquePassword", List.of("ACCOUNT"), List.of("READ")));
+
+        assertEquals("Username already exists", userNameAlreadyExistsException.getMessage());
+    }
 }

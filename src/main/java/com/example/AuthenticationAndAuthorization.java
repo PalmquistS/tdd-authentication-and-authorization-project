@@ -15,15 +15,23 @@ public class AuthenticationAndAuthorization {
     List<UserRights> userRightsList = new ArrayList<>();
 
     // TODO Make a salt length random generator
-    public void addUser(String name, String password, List<String> resource, List<String> rights) {
+    public void addUser(String name, String password, List<String> resource, List<String> rights) throws UserNameAlreadyExistsException {
         encodeAndVerifyPassword = new EncodeAndVerifyPassword();
-        String salt = EncodeAndVerifyPassword.generateSalt(5).get();
-        password = EncodeAndVerifyPassword.hashPassword(password, salt).get();
-        String token = createToken(name, salt);
-        user = new User(name, password, salt, token);
-        userList.add(user);
-        userRights = new UserRights(token, resource, rights);
-        userRightsList.add(userRights);
+        boolean userNameExists = false;
+        for (User value : userList) {
+            if (name.equals(value.getName())) {
+                userNameExists = true;
+            }
+        }
+        if (!userNameExists) {
+            String salt = EncodeAndVerifyPassword.generateSalt(5).get();
+            password = EncodeAndVerifyPassword.hashPassword(password, salt).get();
+            String token = createToken(name, salt);
+            user = new User(name, password, salt, token);
+            userList.add(user);
+            userRights = new UserRights(token, resource, rights);
+            userRightsList.add(userRights);
+        } else throw new UserNameAlreadyExistsException("Username already exists");
     }
 
     private String createToken(String name, String salt) {
@@ -71,15 +79,14 @@ public class AuthenticationAndAuthorization {
         return false;
     }
 
-    public List<String> getUsersRightsInProgram(String token, String resourceName) throws NoRecourceNameException {
+    public List<String> getUsersRightsInProgram(String token, String resourceName) throws WrongResourceNameException {
         List<String> retList = new ArrayList<>();
         for (UserRights value : userRightsList) {
             if (token.equals(value.getToken())) {
-                for (int i = 0; i <value.getResource().size() ; i++) {
-                    if(value.getResource().get(i).equals(resourceName)){
+                for (int i = 0; i < value.getResource().size(); i++) {
+                    if (value.getResource().get(i).equals(resourceName)) {
                         retList.add(value.getRights().get(i));
-                    }else throw new NoRecourceNameException("No resource with that name found");
-
+                    } else throw new WrongResourceNameException("No resource with that name found");
                 }
             }
         }
