@@ -43,10 +43,19 @@ public class AuthenticationAndAuthorizationTest {
     }
 
     @Test
-    void test_check_users_rights_in_program_success() throws WrongTokenReturnException {
+    void test_check_users_rights_in_program_success() throws WrongTokenReturnException, NoRecourceNameException {
         String tokenInReturn =   authenticationAndAuthorization.loggIn("bertil", "123456");
         List<String> userRights = authenticationAndAuthorization.getUsersRightsInProgram(tokenInReturn, "ACCOUNT");
 
         assertEquals(List.of("READ","WRITE"), userRights);
     }
+    @Test
+    void test_check_users_rights_fail_because_of_wrong_resource_name() throws WrongTokenReturnException {
+        String tokenInReturn =   authenticationAndAuthorization.loggIn("bertil", "123456");
+        NoRecourceNameException noRecourceNameException = assertThrows(NoRecourceNameException.class, () ->
+                authenticationAndAuthorization.getUsersRightsInProgram(tokenInReturn, "WrongResourceName"));
+
+        assertEquals("No resource with that name found", noRecourceNameException.getMessage());
+    }
+
 }

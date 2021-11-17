@@ -71,18 +71,18 @@ public class AuthenticationAndAuthorization {
         return false;
     }
 
-    public List<String> getUsersRightsInProgram(String token, String resourceName) {
-        List<String> retString = new ArrayList<>();
+    public List<String> getUsersRightsInProgram(String token, String resourceName) throws NoRecourceNameException {
+        List<String> retList = new ArrayList<>();
         for (UserRights value : userRightsList) {
             if (token.equals(value.getToken())) {
                 for (int i = 0; i <value.getResource().size() ; i++) {
                     if(value.getResource().get(i).equals(resourceName)){
-                        retString.add(value.getRights().get(i));
-                    }
+                        retList.add(value.getRights().get(i));
+                    }else throw new NoRecourceNameException("No resource with that name found");
 
                 }
             }
         }
-        return retString;
+        return retList;
     }
 }
