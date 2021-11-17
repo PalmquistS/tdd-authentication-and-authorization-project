@@ -23,7 +23,7 @@ public class AuthenticationAndAuthorization {
     }
 
     private String createToken(String name, String salt) {
-        return shuffleWord(name+salt);
+        return shuffleWord(name + salt);
     }
 
     public static String shuffleWord(String text) {
@@ -37,25 +37,33 @@ public class AuthenticationAndAuthorization {
         return result.toString();
     }
 
-    public String loggIn(String name, String password) throws WrongTokenReturnException{
+    public String loggIn(String name, String password) throws WrongTokenReturnException {
         encodeAndVerifyPassword = new EncodeAndVerifyPassword();
         boolean isTrue = false;
-        String tokenToBeReturned="";
+        String tokenToBeReturned = "";
         for (User value : userList) {
             if (name.equals(value.getName())) {
                 String salt = value.getSalt();
                 String passwordFromUserList = value.getPassword();
                 if (EncodeAndVerifyPassword.verifyPassword(password, passwordFromUserList, salt)) {
-                    tokenToBeReturned= value.getToken();
+                    tokenToBeReturned = value.getToken();
                     break;
                 }
             }
         }
-        if (tokenToBeReturned.equals("")){
+        if (tokenToBeReturned.equals("")) {
             throw new WrongTokenReturnException("No token found");
         }
         return tokenToBeReturned;
     }
 
 
+    public boolean validateToken(String token) {
+        for (User value : userList) {
+            if (token.equals(value.getToken())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

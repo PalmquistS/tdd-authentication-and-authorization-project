@@ -19,15 +19,24 @@ public class AuthenticationAndAuthorizationTest {
 
     @Test
     void test_logg_in_success() throws WrongTokenReturnException {
-        String isLoggedIn = authenticationAndAuthorization.loggIn("anna", "losen");
-        assertEquals(authenticationAndAuthorization.userList.get(0).getToken(),isLoggedIn);
+        String tokenInReturn = authenticationAndAuthorization.loggIn("anna", "losen");
+        
+        assertEquals(authenticationAndAuthorization.userList.get(0).getToken(), tokenInReturn);
     }
 
     @Test
     void test_logg_in_fail_because_of_wrong_token_return() {
-        WrongTokenReturnException wrongTokenReturnException = assertThrows(WrongTokenReturnException.class, ()->
-                 authenticationAndAuthorization.loggIn("anna", "losenn"));
+        WrongTokenReturnException wrongTokenReturnException = assertThrows(WrongTokenReturnException.class, () ->
+                authenticationAndAuthorization.loggIn("anna", "losenn"));
 
-        assertEquals("No token found",wrongTokenReturnException.getMessage());
+        assertEquals("No token found", wrongTokenReturnException.getMessage());
+    }
+
+    @Test
+    void test_check_if_token_is_valid_success() throws WrongTokenReturnException {
+        String tokenInReturn = authenticationAndAuthorization.loggIn("anna", "losen");
+        boolean isTokenValid = authenticationAndAuthorization.validateToken(tokenInReturn);
+
+        assertTrue(isTokenValid);
     }
 }
