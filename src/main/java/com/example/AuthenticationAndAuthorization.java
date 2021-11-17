@@ -10,16 +10,20 @@ public class AuthenticationAndAuthorization {
 
     EncodeAndVerifyPassword encodeAndVerifyPassword;
     User user;
+    UserRights userRights;
     List<User> userList = new ArrayList<>();
+    List<UserRights> userRightsList = new ArrayList<>();
 
     // TODO Make a salt length random generator
-    public void addUser(String name, String password) {
+    public void addUser(String name, String password, List<String> resource, List<String> rights) {
         encodeAndVerifyPassword = new EncodeAndVerifyPassword();
         String salt = EncodeAndVerifyPassword.generateSalt(5).get();
         password = EncodeAndVerifyPassword.hashPassword(password, salt).get();
         String token = createToken(name, salt);
         user = new User(name, password, salt, token);
         userList.add(user);
+        userRights = new UserRights(token, resource, rights);
+        userRightsList.add(userRights);
     }
 
     private String createToken(String name, String salt) {
@@ -65,5 +69,20 @@ public class AuthenticationAndAuthorization {
             }
         }
         return false;
+    }
+
+    public List<String> getUsersRightsInProgram(String token, String resourceName) {
+        List<String> retString = new ArrayList<>();
+        for (UserRights value : userRightsList) {
+            if (token.equals(value.getToken())) {
+                for (int i = 0; i <value.getResource().size() ; i++) {
+                    if(value.getResource().get(i).equals(resourceName)){
+                        retString.add(value.getRights().get(i));
+                    }
+
+                }
+            }
+        }
+        return retString;
     }
 }
