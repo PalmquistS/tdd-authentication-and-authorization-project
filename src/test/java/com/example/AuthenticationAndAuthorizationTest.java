@@ -18,9 +18,9 @@ public class AuthenticationAndAuthorizationTest {
         authenticationAndAuthorization.addUser("berit", "123456");
         authenticationAndAuthorization.addUser("kalle", "password");
 
-        String userAnnaToken = authenticationAndAuthorization.userList.get(0).getToken();
-        String userBeritToken = authenticationAndAuthorization.userList.get(1).getToken();
-        String userKalleToken = authenticationAndAuthorization.userList.get(2).getToken();
+        String userAnnaToken = authenticationAndAuthorization.userList.get("anna").getToken();
+        String userBeritToken = authenticationAndAuthorization.userList.get("berit").getToken();
+        String userKalleToken = authenticationAndAuthorization.userList.get("kalle").getToken();
 
         authenticationAndAuthorization.giveUserRightsInSystem(userAnnaToken, "ACCOUNT", List.of("READ"));
         authenticationAndAuthorization.giveUserRightsInSystem(userBeritToken, "ACCOUNT", List.of("READ", "WRITE"));
@@ -32,7 +32,7 @@ public class AuthenticationAndAuthorizationTest {
     void test_logg_in_success() throws WrongTokenReturnException {
         String tokenInReturn = authenticationAndAuthorization.loggIn("anna", "losen");
 
-        assertEquals(authenticationAndAuthorization.userList.get(0).getToken(), tokenInReturn);
+        assertEquals(authenticationAndAuthorization.userList.get("anna").getToken(), tokenInReturn);
     }
 
     @Test

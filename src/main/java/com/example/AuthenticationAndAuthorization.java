@@ -6,28 +6,20 @@ import java.util.stream.IntStream;
 
 public class AuthenticationAndAuthorization {
 
-    EncodeAndVerifyPassword encodeAndVerifyPassword;
     User user;
     UserRights userRights;
-    List<User> userList = new ArrayList<>();
+    Map<String, User> userList = new HashMap<>();
     Map<String, UserRights> userRightsList = new HashMap<>();
 
     // TODO Make a salt length random generator
     public void addUser(String name, String password) throws UserNameAlreadyExistsException {
-        encodeAndVerifyPassword = new EncodeAndVerifyPassword();
-
-        if (!userNameAlreadyExists(name)) {
+        if (!userList.containsKey(name)) {
             String salt = EncodeAndVerifyPassword.generateSalt(5).get();
             password = EncodeAndVerifyPassword.hashPassword(password, salt).get();
             String token = createToken(name, salt);
-            user = new User(name, password, salt, token);
-            userList.add(user);
+            user = new User(password, salt, token);
+            userList.put(name, user);
         } else throw new UserNameAlreadyExistsException("Username already exists");
-    }
-
-    private boolean userNameAlreadyExists(String name) {
-        return userList.stream()
-                .anyMatch(p -> p.getName().equals(name));
     }
 
     private String createToken(String name, String salt) {
@@ -46,28 +38,16 @@ public class AuthenticationAndAuthorization {
     }
 
     public String loggIn(String name, String password) throws WrongTokenReturnException {
-        encodeAndVerifyPassword = new EncodeAndVerifyPassword();
-        String tokenToBeReturned = "";
-        for (User value : userList) {
-            if (name.equals(value.getName())) {
-                String salt = value.getSalt();
-                String passwordFromUserList = value.getPassword();
-                if (EncodeAndVerifyPassword.verifyPassword(password, passwordFromUserList, salt)) {
-                    tokenToBeReturned = value.getToken();
-                    break;
-                }
-            }
-        }
-        if (tokenToBeReturned.equals("")) {
-            throw new WrongTokenReturnException("No token found");
-        }
-        return tokenToBeReturned;
+        if (EncodeAndVerifyPassword.verifyPassword(password,
+                userList.get(name).getPassword(),
+                userList.get(name).getSalt())) {
+            return userList.get(name).getToken();
+        } else throw new WrongTokenReturnException("No token found");
     }
 
 
     public boolean validateToken(String token) {
-        return userList.stream()
-                .anyMatch(p -> p.getToken().equals(token));
+        return userList.entrySet().stream().anyMatch(p -> p.getValue().getToken().equals(token));
     }
 
     public List<String> getUsersRightsInProgram(String token, String resourceName) throws WrongResourceNameException {
