@@ -22,9 +22,9 @@ public class AuthenticationAndAuthorizationTest {
         String userBeritToken = authenticationAndAuthorization.userList.get("berit").getToken();
         String userKalleToken = authenticationAndAuthorization.userList.get("kalle").getToken();
 
-        authenticationAndAuthorization.giveUserRightsInSystem(userAnnaToken, "ACCOUNT", List.of("READ"));
-        authenticationAndAuthorization.giveUserRightsInSystem(userBeritToken, "ACCOUNT", List.of("READ", "WRITE"));
-        authenticationAndAuthorization.giveUserRightsInSystem(userKalleToken, "ACCOUNT", List.of("READ"));
+        authenticationAndAuthorization.giveUserRightsInSystem(userAnnaToken, Resource.ACCOUNT, List.of("READ"));
+        authenticationAndAuthorization.giveUserRightsInSystem(userBeritToken ,Resource.ACCOUNT, List.of("READ", "WRITE"));
+        authenticationAndAuthorization.giveUserRightsInSystem(userKalleToken, Resource.PROVISION_CALC, List.of("READ"));
 
     }
 
@@ -52,21 +52,13 @@ public class AuthenticationAndAuthorizationTest {
     }
 
     @Test
-    void test_check_users_rights_in_program_success() throws WrongTokenReturnException, WrongResourceNameException {
+    void test_check_users_rights_in_program_success() throws WrongTokenReturnException {
         String tokenInReturn = authenticationAndAuthorization.loggIn("berit", "123456");
-        List<String> userRights = authenticationAndAuthorization.getUsersRightsInProgram(tokenInReturn, "ACCOUNT");
+        List<String> userRights = authenticationAndAuthorization.getUsersRightsInProgram(tokenInReturn, Resource.ACCOUNT);
 
         assertEquals(List.of("READ", "WRITE"), userRights);
     }
 
-    @Test
-    void test_check_users_rights_fail_because_of_wrong_resource_name() throws WrongTokenReturnException {
-        String tokenInReturn = authenticationAndAuthorization.loggIn("berit", "123456");
-        WrongResourceNameException wrongResourceNameException = assertThrows(WrongResourceNameException.class, () ->
-                authenticationAndAuthorization.getUsersRightsInProgram(tokenInReturn, "WrongResourceName"));
-
-        assertEquals("No resource with that name found", wrongResourceNameException.getMessage());
-    }
 
     @Test
     void test_add_new_user_fail_because_username_already_exists() {

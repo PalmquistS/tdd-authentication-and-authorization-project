@@ -50,15 +50,12 @@ public class AuthenticationAndAuthorization {
         return userList.entrySet().stream().anyMatch(p -> p.getValue().getToken().equals(token));
     }
 
-    public List<String> getUsersRightsInProgram(String token, String resourceName) throws WrongResourceNameException {
+    public List<String> getUsersRightsInProgram(String token, Resource resourceName)  {
         List<String> retList = userRightsList.get(token).getResourcesRights().get(resourceName);
-        if (retList == null) {
-            throw new WrongResourceNameException("No resource with that name found");
-        }
         return retList;
     }
 
-    public void giveUserRightsInSystem(String token, String resource, List<String> rights) {
+    public void giveUserRightsInSystem(String token, Resource resource, List<String> rights) {
         UserRights userRights = new UserRights(resource, rights);
         userRightsList.put(token, userRights);
     }

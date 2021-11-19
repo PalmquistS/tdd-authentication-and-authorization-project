@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 public class UserRights {
-    private final Map<String, List<String>> resourcesRights = new HashMap<>();
+    private final Map<Resource, List<String>> resourcesRights = new HashMap<>();
 
-    public UserRights(String resource, List<String> rights) {
+    public UserRights(Resource resource, List<String> rights) {
         resourcesRights.put(resource, rights);
     }
 
 
-    public Map<String, List<String>> getResourcesRights() {
+    public Map<Resource, List<String>> getResourcesRights() {
         return resourcesRights;
     }
 }
