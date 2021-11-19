@@ -14,9 +14,18 @@ public class AuthenticationAndAuthorizationTest {
     @BeforeEach
     void setUp() throws UserNameAlreadyExistsException {
         authenticationAndAuthorization = new AuthenticationAndAuthorization();
-        authenticationAndAuthorization.addUser("anna", "losen", List.of("ACCOUNT"), List.of("READ"));
-        authenticationAndAuthorization.addUser("berit", "123456", List.of("ACCOUNT", "ACCOUNT"), List.of("READ", "WRITE"));
-        authenticationAndAuthorization.addUser("kalle", "password", List.of("PROVISION_CALC"), List.of("EXECUTE"));
+        authenticationAndAuthorization.addUser("anna", "losen");
+        authenticationAndAuthorization.addUser("berit", "123456");
+        authenticationAndAuthorization.addUser("kalle", "password");
+
+        String userAnnaToken = authenticationAndAuthorization.userList.get(0).getToken();
+        String userBeritToken = authenticationAndAuthorization.userList.get(1).getToken();
+        String userKalleToken = authenticationAndAuthorization.userList.get(2).getToken();
+
+        authenticationAndAuthorization.giveUserRightsInSystem(userAnnaToken, "ACCOUNT", List.of("READ"));
+        authenticationAndAuthorization.giveUserRightsInSystem(userBeritToken, "ACCOUNT", List.of("READ", "WRITE"));
+        authenticationAndAuthorization.giveUserRightsInSystem(userKalleToken, "ACCOUNT", List.of("READ"));
+
     }
 
     @Test
@@ -62,7 +71,7 @@ public class AuthenticationAndAuthorizationTest {
     @Test
     void test_add_new_user_fail_because_username_already_exists() {
         UserNameAlreadyExistsException userNameAlreadyExistsException = assertThrows(UserNameAlreadyExistsException.class, () ->
-                authenticationAndAuthorization.addUser("anna", "uniquePassword", List.of("ACCOUNT"), List.of("READ")));
+                authenticationAndAuthorization.addUser("anna", "uniquePassword"));
 
         assertEquals("Username already exists", userNameAlreadyExistsException.getMessage());
     }

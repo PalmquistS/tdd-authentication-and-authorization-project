@@ -1,8 +1,6 @@
 package com.example;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -12,26 +10,24 @@ public class AuthenticationAndAuthorization {
     User user;
     UserRights userRights;
     List<User> userList = new ArrayList<>();
-    List<UserRights> userRightsList = new ArrayList<>();
+    Map<String, UserRights> userRightsList = new HashMap<>();
 
     // TODO Make a salt length random generator
-    public void addUser(String name, String password, List<String> resource, List<String> rights) throws UserNameAlreadyExistsException {
+    public void addUser(String name, String password) throws UserNameAlreadyExistsException {
         encodeAndVerifyPassword = new EncodeAndVerifyPassword();
-        boolean userNameExists = false;
-        for (User value : userList) {
-            if (name.equals(value.getName())) {
-                userNameExists = true;
-            }
-        }
-        if (!userNameExists) {
+
+        if (!userNameAlreadyExists(name)) {
             String salt = EncodeAndVerifyPassword.generateSalt(5).get();
             password = EncodeAndVerifyPassword.hashPassword(password, salt).get();
             String token = createToken(name, salt);
             user = new User(name, password, salt, token);
             userList.add(user);
-            userRights = new UserRights(token, resource, rights);
-            userRightsList.add(userRights);
         } else throw new UserNameAlreadyExistsException("Username already exists");
+    }
+
+    private boolean userNameAlreadyExists(String name) {
+        return userList.stream()
+                .anyMatch(p -> p.getName().equals(name));
     }
 
     private String createToken(String name, String salt) {
@@ -51,7 +47,6 @@ public class AuthenticationAndAuthorization {
 
     public String loggIn(String name, String password) throws WrongTokenReturnException {
         encodeAndVerifyPassword = new EncodeAndVerifyPassword();
-        boolean isTrue = false;
         String tokenToBeReturned = "";
         for (User value : userList) {
             if (name.equals(value.getName())) {
@@ -71,25 +66,20 @@ public class AuthenticationAndAuthorization {
 
 
     public boolean validateToken(String token) {
-        for (User value : userList) {
-            if (token.equals(value.getToken())) {
-                return true;
-            }
-        }
-        return false;
+        return userList.stream()
+                .anyMatch(p -> p.getToken().equals(token));
     }
 
     public List<String> getUsersRightsInProgram(String token, String resourceName) throws WrongResourceNameException {
-        List<String> retList = new ArrayList<>();
-        for (UserRights value : userRightsList) {
-            if (token.equals(value.getToken())) {
-                for (int i = 0; i < value.getResource().size(); i++) {
-                    if (value.getResource().get(i).equals(resourceName)) {
-                        retList.add(value.getRights().get(i));
-                    } else throw new WrongResourceNameException("No resource with that name found");
-                }
-            }
+        List<String> retList = userRightsList.get(token).getResourcesRights().get(resourceName);
+        if (retList == null) {
+            throw new WrongResourceNameException("No resource with that name found");
         }
         return retList;
+    }
+
+    public void giveUserRightsInSystem(String token, String resource, List<String> rights) {
+        UserRights userRights = new UserRights(resource, rights);
+        userRightsList.put(token, userRights);
     }
 }

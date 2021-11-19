@@ -1,27 +1,19 @@
 package com.example;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserRights {
-    private String token;
-    private List<String> resource;
-    private List<String> rights;
+    private final Map<String, List<String>> resourcesRights = new HashMap<>();
 
-    public UserRights(String token, List<String> resource, List<String> rights) {
-        this.token = token;
-        this.resource = resource;
-        this.rights = rights;
+    public UserRights(String resource, List<String> rights) {
+
+        resourcesRights.put(resource, rights);
     }
 
-    public String getToken() {
-        return token;
-    }
 
-    public List<String> getResource() {
-        return resource;
-    }
-
-    public List<String> getRights() {
-        return rights;
+    public Map<String, List<String>> getResourcesRights() {
+        return resourcesRights;
     }
 }
